@@ -1,5 +1,8 @@
 const express = require('express');
 
+const { Repair } = require('./models/repair.models');
+const { User } = require('./models/user.model');
+
 const { db } = require('./utils/database');
 
 const app = express();
@@ -7,6 +10,8 @@ const app = express();
 const { usersRouter } = require('./routes/users.routes');
 
 const { repairsRouter } = require('./routes/repair.routes');
+
+const { globalErrorHandler } = require('./controllers/errors.controller');
 
 app.use(express.json());
 
@@ -21,7 +26,12 @@ db.sync()
 app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/repairs', repairsRouter);
 
-const PORT = 1520;
+app.use('*', globalErrorHandler);
+
+User.hasMany(Repair);
+Repair.belongsTo(User);
+
+const PORT = process.env.PORT || 1520;
 
 app.listen(PORT, () => {
   console.log(`Express app running on port: ${PORT}`);

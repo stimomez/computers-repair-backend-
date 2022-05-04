@@ -1,93 +1,55 @@
 const { Repair } = require('../models/repair.models');
+const { User } = require('../models/user.model');
+const { catchAsync } = require('../utils/catchAsync');
 
-const getAllPendingEquipments = async (req, res) => {
-  try {
-    const repairs = await Repair.findAll();
+const getAllPendingEquipments = catchAsync(async (req, res) => {
+  const repairs = await Repair.findAll({
+    include: [{ model: User }],
+  });
 
-    res.status(200).json({
-      repairs,
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
+  res.status(200).json({
+    repairs,
+  });
+});
 
-const createAppointment = async (req, res) => {
-  try {
-    const { date, userId } = req.body;
+const createAppointment = catchAsync(async (req, res, next) => {
+  const { date, userId, computerNumber, comments } = req.body;
 
-    const newAppointment = await Repair.create({
-      date,
-      userId,
-    });
+  const newAppointment = await Repair.create({
+    date,
+    userId,
+    computerNumber,
+    comments,
+  });
 
-    res.status(201).json({ newAppointment });
-  } catch (error) {
-    console.log(error);
-  }
-};
+  res.status(201).json({ newAppointment });
+});
 
-const pendingEquipmentsById = async (req, res) => {
-  try {
-    const { id } = req.params;
+const pendingEquipmentsById = catchAsync(async (req, res, next) => {
+  const { repair } = req;
 
-    const pendingEquipment = await Repair.findOne({ where: { id } });
-    if (!pendingEquipment) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'teams not found given that id',
-      });
-    }
+  res.status(200).json({
+    repair,
+  });
+});
 
-    res.status(200).json({
-      pendingEquipment,
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
+const updateRepairStatus = catchAsync(async (req, res, next) => {
+  const { repair } = req;
 
-const updateRepairStatus = async (req, res) => {
-  try {
-    const { id } = req.params;
+  repair.update({ status: 'completed' });
+  res.status(200).json({
+    status: 'success',
+  });
+});
 
-    const pendingEquipment = await Repair.findOne({ where: { id } });
-    if (!pendingEquipment) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'teams not found given that id',
-      });
-    }
+const cancelRepair = catchAsync(async (req, res, next) => {
+  const { repair } = req;
 
-    pendingEquipment.update({ status: 'completed' });
-    res.status(200).json({
-      status: 'success',
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const cancelRepair = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const pendingEquipment = await Repair.findOne({ where: { id } });
-    if (!pendingEquipment) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'teams not found given that id fff',
-      });
-    }
-
-    pendingEquipment.update({ status: 'cancel' });
-    res.status(200).json({
-      status: 'success',
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
+  repair.update({ status: 'cancel' });
+  res.status(200).json({
+    status: 'success',
+  });
+});
 module.exports = {
   getAllPendingEquipments,
   createAppointment,
