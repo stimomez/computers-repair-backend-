@@ -1,11 +1,13 @@
 const express = require('express');
-
-const { Repair } = require('./models/repair.models');
-const { User } = require('./models/user.model');
+const cors = require('cors');
 
 const { db } = require('./utils/database');
 
+const { initModels } = require('./models/initModels');
+
 const app = express();
+
+app.use(cors());
 
 const { usersRouter } = require('./routes/users.routes');
 
@@ -28,8 +30,7 @@ app.use('/api/v1/repairs', repairsRouter);
 
 app.use('*', globalErrorHandler);
 
-User.hasMany(Repair);
-Repair.belongsTo(User);
+initModels();
 
 const PORT = process.env.PORT || 1520;
 

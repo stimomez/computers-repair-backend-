@@ -2,9 +2,9 @@ const { Repair } = require('../models/repair.models');
 const { User } = require('../models/user.model');
 const { catchAsync } = require('../utils/catchAsync');
 
-const getAllPendingEquipments = catchAsync(async (req, res) => {
+const getAllPendingEquipments = catchAsync(async (req, res,next) => {
   const repairs = await Repair.findAll({
-    include: [{ model: User }],
+    include: [{ model: User, attributes: { exclude: ['password']} }],
   });
 
   res.status(200).json({
@@ -35,8 +35,8 @@ const pendingEquipmentsById = catchAsync(async (req, res, next) => {
 
 const updateRepairStatus = catchAsync(async (req, res, next) => {
   const { repair } = req;
-
-  repair.update({ status: 'completed' });
+ 
+ await repair.update({ status: 'completed' });
   res.status(200).json({
     status: 'success',
   });
@@ -45,7 +45,7 @@ const updateRepairStatus = catchAsync(async (req, res, next) => {
 const cancelRepair = catchAsync(async (req, res, next) => {
   const { repair } = req;
 
-  repair.update({ status: 'cancel' });
+ await repair.update({ status: 'cancel' });
   res.status(200).json({
     status: 'success',
   });

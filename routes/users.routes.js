@@ -1,10 +1,16 @@
 const express = require('express');
 const router = express.Router();
 
-const { userExists } = require('../middlewares/users.middlewares');
+const {
+  userExists,
+  proctectToken,
+  proctectEmployee,
+  protectAccountOwner
+} = require('../middlewares/users.middlewares');
 const {
   createUserValidations,
   checkValidations,
+  
 } = require('../middlewares/validationsUsers.middlewares');
 
 const {
@@ -13,16 +19,20 @@ const {
   updateUser,
   getUserById,
   deleteUser,
+  login,
 } = require('../controllers/user.controller');
 
-router.get('/', getAllUsers);
+router.post('/login', login);
+router.post('/', createUserValidations, checkValidations, createUser);
 
-router.post('/',createUserValidations, checkValidations, createUser);
+router.use(proctectToken,);
 
+router.get('/', proctectEmployee, getAllUsers);
+ 
 router
   .route('/:id')
-  .get(userExists, getUserById)
-  .patch(userExists, updateUser)
-  .delete(userExists, deleteUser);
+  .get(userExists,proctectEmployee, getUserById)
+  .patch(userExists, protectAccountOwner, updateUser)
+  .delete(userExists,protectAccountOwner, deleteUser);
 
 module.exports = { usersRouter: router };

@@ -13,7 +13,7 @@ const pendingRepair = catchAsync( async (req, res, next) => {
       return next(new AppError('Repair does not exist with given Id', 404));
     }
   
-    req.rapair = repair;
+    req.repair = repair;
     next();
   });
 

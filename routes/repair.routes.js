@@ -1,8 +1,15 @@
 const express = require('express');
 const router = express.Router();
 
+const {
+  proctectEmployee,
+  proctectToken,
+} = require('../middlewares/users.middlewares');
 const { pendingRepair } = require('../middlewares/repairs.middlewares');
-const { createService, checkValidations} = require('../middlewares/validationsRepairs.middlewares')
+const {
+  createService,
+  checkValidations,
+} = require('../middlewares/validationsRepairs.middlewares');
 const {
   getAllPendingEquipments,
   createAppointment,
@@ -11,9 +18,10 @@ const {
   cancelRepair,
 } = require('../controllers/repair.controller');
 
-router.get('/', getAllPendingEquipments);
-router.post('/',createService, checkValidations, createAppointment);
+router.post('/', createService, checkValidations, createAppointment);
+router.use(proctectToken, proctectEmployee);
 
+router.get('/', getAllPendingEquipments);
 router
   .route('/:id')
   .get(pendingRepair, pendingEquipmentsById)
